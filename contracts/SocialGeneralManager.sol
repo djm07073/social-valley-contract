@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
+//TODO: 도연 누나 TODO 채우기
 contract SocialGeneralManager is Ownable {
     /******* Enum *******/
     enum SocialType {
@@ -25,7 +26,7 @@ contract SocialGeneralManager is Ownable {
     }
 
     /******* Event *******/
-    event GatherInformation(
+    event ReceiveSocialMerkleRoot(
         uint updateBlockTimestamp,
         uint chainId,
         uint merkleRoot
@@ -36,7 +37,7 @@ contract SocialGeneralManager is Ownable {
         //TODO: receive message from social chain leader through CCIP
         // CCIP Receiver를 사용해서 다른 체인 위에 있는 Social Chain Leader가 보낸 정보를 받아온다.
         // 아래와 같이 받아온 merkleRoot를 이벤트 처리한다.
-        // emit GatherInformation(block.timestamp,chainId _merkleRoot);
+        // emit ReceiveSocialMerkleRoot(block.timestamp,chainId _merkleRoot);
     }
 
     /******* View ******/
