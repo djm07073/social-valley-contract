@@ -45,7 +45,45 @@ abstract contract SocialChainLeader is MessageSender {
     // A1 A2 A3 A4 A5 A6
     function createBalancedMerkleRoot(
         address[] memory changedAccounts
-    ) internal view virtual returns (bytes32) {}
+    ) internal view virtual returns (bytes32) {
+        uint256 numLeaves = changedAccounts.length;
+        if (numLeaves == 0) {
+            return bytes32(0);
+        } else {
+            bytes32[] memory leaves = new bytes32[](numLeaves);
+
+            for (uint256 i = 0; i < numLeaves; i++) {
+                // Convert the address to bytes32 and use it as a leaf in the Merkle tree
+                leaves[i] = bytes32(uint256(uint160(changedAccounts[i])));
+            }
+
+            return _calculateMerkleRoot(leaves);
+        }
+    }
+
+    function _calculateMerkleRoot(
+        bytes32[] memory elements
+    ) internal pure returns (bytes32) {
+        require(
+            elements.length > 0,
+            "Merkle tree requires at least one element."
+        );
+
+        while (elements.length > 1) {
+            bytes32[] memory parentLevel = new bytes32[](elements.length / 2);
+
+            for (uint256 i = 0; i < elements.length / 2; i++) {
+                // Combine pairs of elements to create parents
+                parentLevel[i] = keccak256(
+                    abi.encodePacked(elements[i * 2], elements[i * 2 + 1])
+                );
+            }
+
+            elements = parentLevel;
+        }
+
+        return elements[0];
+    }
 
     /**
      * @notice Check if the state of account has changed
