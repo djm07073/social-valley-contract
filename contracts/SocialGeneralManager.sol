@@ -39,7 +39,7 @@ contract SocialGeneralManager is Ownable, CCIPReceiver {
 
     /******* External *******/
     function receiveInformation(
-        Client.MessageFromLeader memory messageFromLeader
+        Client.Any2EVMMessage memory any2EvmMessage
     ) external onlyOwner {
         emit GatherInformation(
             block.timestamp,
