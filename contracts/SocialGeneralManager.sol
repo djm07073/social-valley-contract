@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
+import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
 
-contract SocialGeneralManager is Ownable {
+contract SocialGeneralManager is Ownable, CCIPReceiver {
     /******* Enum *******/
     enum SocialType {
         POST_TECH, //Arbitrum
@@ -31,12 +33,19 @@ contract SocialGeneralManager is Ownable {
         uint merkleRoot
     );
 
+    // TODO: receive message from social chain leader through CCIP
+    // CCIP Receiver를 사용해서 다른 체인 위에 있는 Social Chain Leader가 보낸 정보를 받아온다.
+    // 아래와 같이 받아온 merkleRoot를 이벤트 처리한다.
+
     /******* External *******/
-    function receiveInformation(uint _merkleRoot) external onlyOwner {
-        //TODO: receive message from social chain leader through CCIP
-        // CCIP Receiver를 사용해서 다른 체인 위에 있는 Social Chain Leader가 보낸 정보를 받아온다.
-        // 아래와 같이 받아온 merkleRoot를 이벤트 처리한다.
-        // emit GatherInformation(block.timestamp,chainId _merkleRoot);
+    function receiveInformation(
+        Client.Any2EVMMessage memory any2EvmMessage
+    ) external onlyOwner {
+        emit GatherInformation(
+            block.timestamp,
+            messageFromLeader.chainId,
+            messageFromLeader.merkleRoot
+        );
     }
 
     /******* View ******/
