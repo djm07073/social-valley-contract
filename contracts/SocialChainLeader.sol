@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
+import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import {MessageSender} from "./MessageSender.sol";
 
 /**
@@ -8,6 +9,7 @@ import {MessageSender} from "./MessageSender.sol";
  * @author Beaker Jin
  * @notice Gather social finance information from chain that this contract deployed
  */
+
 abstract contract SocialChainLeader is MessageSender {
     address public immutable socialFi;
     uint public immutable interval;
@@ -34,8 +36,14 @@ abstract contract SocialChainLeader is MessageSender {
         generalManager = _generalManager;
     }
 
-    // skewed merkle tree
-    function createSkewedMerkleRoot(
+    //        Root - epoch N (0,1,2,3, ...)
+    //        / \
+    //      H1    H2
+    //     / \    / \
+    //   H3  H4  H5  H6
+    //  / \ / \ / \ / \
+    // A1 A2 A3 A4 A5 A6
+    function createBalancedMerkleRoot(
         address[] memory changedAccounts
     ) internal view virtual returns (bytes32) {}
 
@@ -46,6 +54,17 @@ abstract contract SocialChainLeader is MessageSender {
      * @dev This function will be called by Time-based trigger per 15 minutes
      * @return balancedMerkleRoot The merkle root of the state of all accounts that have changed in the last 30 minutes
      */
+    //     Root
+    //     / \
+    //   H1 merkleRoot of epoch N + 12 ~ N + 15
+    //      / \
+    //     H2 merkleRoot of epoch N + 8 ~ N + 11
+    //        /  \
+    //      H3   merkleRoot of epoch N + 4 ~ N + 7
+    //     /  \
+    //    /    \
+    //  last  merkleRoot of epoch N ~ N + 3
+
     function createSkewedMerkleRootOfChangeAccount()
         external
         returns (bytes32 balancedMerkleRoot)
@@ -60,7 +79,7 @@ abstract contract SocialChainLeader is MessageSender {
             }
         }
         // 2. create skewed merkle root & balanced merkle root of present epoch
-        balancedMerkleRoot = createSkewedMerkleRoot(changedAccount);
+        balancedMerkleRoot = createBalancedMerkleRoot(changedAccount);
         lastSkewedMerkleRoot = keccak256(
             abi.encodePacked(lastSkewedMerkleRoot, balancedMerkleRoot)
         );
@@ -75,7 +94,7 @@ abstract contract SocialChainLeader is MessageSender {
 
     function _checkAccountChange(
         address account
-    ) internal view virtual returns (bool) {}
+    ) internal virtual returns (bool);
 
     /**
      * @notice Send the merkle root to general manager
@@ -109,6 +128,4 @@ abstract contract SocialChainLeader is MessageSender {
             }
         }
     }
-
-    function checkChangeSocial() public view virtual {}
 }

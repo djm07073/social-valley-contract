@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
 import {SocialChainLeader} from "./SocialChainLeader.sol";
-import {IPostTechProfile} from "./post_tech/IPostTechProfile.sol";
+import {IFriend3V1} from "./friend3/IFriend3V1.sol";
 
-contract Arbitrum_SocialChainLeaders is SocialChainLeader {
+contract BNB_SocialChainLeaders is SocialChainLeader {
     struct AccountState {
         uint256 buyPrice;
         uint256 sellPrice;
@@ -30,20 +30,14 @@ contract Arbitrum_SocialChainLeaders is SocialChainLeader {
     function _checkAccountChange(
         address account
     ) internal virtual override returns (bool isChanged) {
-        uint256 _buyPrice = IPostTechProfile(socialFi).getBuyPrice(account, 1);
-        uint256 _sellPrice = IPostTechProfile(socialFi).getSellPrice(
-            account,
-            1
-        );
-        uint256 _sharesSupply = IPostTechProfile(socialFi).sharesSupply(
-            account
-        );
+        uint256 _buyPrice = IFriend3V1(socialFi).getBuyPrice(account, 1);
+        uint256 _sellPrice = IFriend3V1(socialFi).getSellPrice(account, 1);
+        uint256 _sharesSupply = IFriend3V1(socialFi).ticketsSupply(account);
 
         isChanged =
             _buyPrice != lastAccountUpdate[account].buyPrice ||
             _sellPrice != lastAccountUpdate[account].sellPrice ||
             _sharesSupply != lastAccountUpdate[account].sharesSupply;
-
         if (isChanged) {
             lastAccountUpdate[account].buyPrice = _buyPrice;
             lastAccountUpdate[account].sellPrice = _sellPrice;

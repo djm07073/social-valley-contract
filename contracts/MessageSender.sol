@@ -15,14 +15,11 @@ import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interface
 
 /// @title - A simple messenger contract for sending/receving string data across chains.
 abstract contract MessageSender is OwnerIsCreator {
-    uint64 public constant POLYGON_CHAIN_SELECTOR = 4051577828743386545;
+    uint64 public constant DESTINATION_CHAIN_SELECTOR = 4051577828743386545;
     // Custom errors to provide more descriptive revert messages.
     error NotEnoughBalance(uint256 currentBalance, uint256 calculatedFees); // Used to make sure contract has enough balance.
     error NothingToWithdraw(); // Used when trying to withdraw Ether but there's nothing to withdraw.
     error FailedToWithdrawEth(address owner, address target, uint256 value); // Used when the withdrawal of Ether fails.
-    error DestinationChainNotWhitelisted(uint64 destinationChainSelector); // Used when the destination chain has not been whitelisted by the contract owner.
-    error SourceChainNotWhitelisted(uint64 sourceChainSelector); // Used when the source chain has not been whitelisted by the contract owner.
-    error SenderNotWhitelisted(address sender); // Used when the sender has not been whitelisted by the contract owner.
 
     // Event emitted when a message is sent to another chain.
     event MessageSent(
@@ -82,7 +79,10 @@ abstract contract MessageSender is OwnerIsCreator {
         IRouterClient router = IRouterClient(ccip_router);
 
         // Get the fee required to send the CCIP message
-        uint256 fees = router.getFee(POLYGON_CHAIN_SELECTOR, evm2AnyMessage);
+        uint256 fees = router.getFee(
+            DESTINATION_CHAIN_SELECTOR,
+            evm2AnyMessage
+        );
 
         if (fees > linkToken.balanceOf(address(this)))
             revert NotEnoughBalance(linkToken.balanceOf(address(this)), fees);
@@ -91,12 +91,12 @@ abstract contract MessageSender is OwnerIsCreator {
         linkToken.approve(address(router), fees);
 
         // Send the CCIP message through the router and store the returned CCIP message ID
-        messageId = router.ccipSend(POLYGON_CHAIN_SELECTOR, evm2AnyMessage);
+        messageId = router.ccipSend(DESTINATION_CHAIN_SELECTOR, evm2AnyMessage);
 
         // Emit an event with message details
         emit MessageSent(
             messageId,
-            POLYGON_CHAIN_SELECTOR,
+            DESTINATION_CHAIN_SELECTOR,
             _receiver,
             _merkleRoot,
             address(linkToken),
@@ -128,21 +128,24 @@ abstract contract MessageSender is OwnerIsCreator {
         IRouterClient router = IRouterClient(ccip_router);
 
         // Get the fee required to send the CCIP message
-        uint256 fees = router.getFee(POLYGON_CHAIN_SELECTOR, evm2AnyMessage);
+        uint256 fees = router.getFee(
+            DESTINATION_CHAIN_SELECTOR,
+            evm2AnyMessage
+        );
 
         if (fees > address(this).balance)
             revert NotEnoughBalance(address(this).balance, fees);
 
         // Send the CCIP message through the router and store the returned CCIP message ID
         messageId = router.ccipSend{value: fees}(
-            POLYGON_CHAIN_SELECTOR,
+            DESTINATION_CHAIN_SELECTOR,
             evm2AnyMessage
         );
 
         // Emit an event with message details
         emit MessageSent(
             messageId,
-            POLYGON_CHAIN_SELECTOR,
+            DESTINATION_CHAIN_SELECTOR,
             _receiver,
             _merkleRoot,
             address(0),

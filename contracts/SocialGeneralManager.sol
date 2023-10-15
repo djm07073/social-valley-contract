@@ -8,29 +8,36 @@ contract SocialGeneralManager is Ownable, CCIPReceiver {
     /******* Enum *******/
     enum SocialType {
         POST_TECH, //Arbitrum
-        LENS, //Polygon
-        STAR_ARENA //Avalanche
+        FRIEND_TECH, //BASE
+        FRIEND3 //BNB
     }
+
     /******* Storage *******/
     //** 주소에 대해 폴리곤 아이디 맵핑
-    mapping(address => uint) public polygonIds;
-    //** 폴리곤 아이디에 대한 주소 맵핑
-    mapping(uint => mapping(SocialType => bool)) public accountRegistration;
+    // mapping(address => uint) public polygonIds;
+    //** 소셜 파이 종류 => 소셜 파이에서 쓰는 계정 => 폴리곤 계정 맵핑
+    mapping(SocialType => mapping(address => address))
+        public accountRegistration;
     //** 폴리곤 아이디에 대한 ifps metadata uri mapping, 실질적인
-    mapping(uint => string) public accountMetadataUri;
-    string public immutable basicUri;
+    mapping(address => string) public accountMetadataUri;
+    mapping(uint64 => address) public whiteList;
+    mapping(uint64 => uint32) public chainId;
+    string public basicUri = "";
 
     //** 다른 소셜 체인
     /******* Constructor *******/
-    constructor(string memory _basicUri) Ownable(msg.sender) {
+    constructor(
+        string memory _basicUri,
+        address _router
+    ) CCIPReceiver(_router) Ownable(msg.sender) {
         basicUri = _basicUri;
     }
 
     /******* Event *******/
     event GatherInformation(
-        uint updateBlockTimestamp,
-        uint chainId,
-        uint merkleRoot
+        bytes32 indexed messageId,
+        uint32 chainId,
+        bytes skewedMerkleRoot
     );
 
     // TODO: receive message from social chain leader through CCIP
@@ -38,42 +45,63 @@ contract SocialGeneralManager is Ownable, CCIPReceiver {
     // 아래와 같이 받아온 merkleRoot를 이벤트 처리한다.
 
     /******* External *******/
-    function receiveInformation(
-        Client.Any2EVMMessage memory any2EvmMessage
-    ) external onlyOwner {
+    function ccipReceive(
+        Client.Any2EVMMessage calldata message
+    ) external override onlyRouter {
+        _ccipReceive(message);
+    }
+
+    function _ccipReceive(
+        Client.Any2EVMMessage memory message
+    ) internal override {
+        require(
+            whiteList[message.sourceChainSelector] ==
+                abi.decode(message.sender, (address)),
+            "Not in whitelist"
+        );
         emit GatherInformation(
-            block.timestamp,
-            messageFromLeader.chainId,
-            messageFromLeader.merkleRoot
+            message.messageId,
+            chainId[message.sourceChainSelector],
+            message.data
         );
     }
 
     /******* View ******/
-    function getUri(uint _polygonId) external view returns (string memory) {
+    function getUri(
+        address valleyAddress
+    ) external view returns (string memory) {
         return
-            string(abi.encodePacked(basicUri, accountMetadataUri[_polygonId]));
+            string(
+                abi.encodePacked(basicUri, accountMetadataUri[valleyAddress])
+            );
     }
 
     /******* Admin *******/
-    function setPolygonId(
-        address _address,
-        uint _polygonId
-    ) external onlyOwner {
-        polygonIds[_address] = _polygonId;
-    }
-
     function setAccountRegistration(
-        uint _polygonId,
         SocialType _socialType,
-        bool _isRegistered
+        address socialAddress
     ) external onlyOwner {
-        accountRegistration[_polygonId][_socialType] = _isRegistered;
+        accountRegistration[_socialType][socialAddress] = msg.sender;
     }
 
     function setAccountMetadataUri(
-        uint _polygonId,
+        address _valleyAddress,
         string memory _metadataUri
     ) external onlyOwner {
-        accountMetadataUri[_polygonId] = _metadataUri;
+        accountMetadataUri[_valleyAddress] = _metadataUri;
+    }
+
+    function setWhiteList(
+        uint64 chainSelector,
+        address chainleader
+    ) external onlyOwner {
+        whiteList[chainSelector] = chainleader;
+    }
+
+    function setChainId(
+        uint64 chainSelector,
+        uint32 _chainId
+    ) external onlyOwner {
+        chainId[chainSelector] = _chainId;
     }
 }
