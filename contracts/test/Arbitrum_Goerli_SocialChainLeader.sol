@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
-import {SocialChainLeader} from "./SocialChainLeader.sol";
-import {IFriend3V1} from "./friend3/IFriend3V1.sol";
+import {Test_SocialChainLeader} from "./Test_SocialChainLeader.sol";
+import {IPostTechProfile} from "../post_tech/IPostTechProfile.sol";
 
-contract BNB_SocialChainLeaders is SocialChainLeader {
+contract Arbitrum_Goeril_SocialChainLeader is Test_SocialChainLeader {
     struct AccountState {
         uint256 buyPrice;
         uint256 sellPrice;
@@ -12,32 +12,29 @@ contract BNB_SocialChainLeaders is SocialChainLeader {
     mapping(address => AccountState) public lastAccountUpdate;
 
     constructor(
-        uint updateInterval,
         address router,
         address link,
         address _socialFi,
         address _generalManager
-    )
-        SocialChainLeader(
-            updateInterval,
-            router,
-            link,
-            _socialFi,
-            _generalManager
-        )
-    {}
+    ) Test_SocialChainLeader(router, link, _socialFi, _generalManager) {}
 
     function _checkAccountChange(
         address account
     ) internal virtual override returns (bool isChanged) {
-        uint256 _buyPrice = IFriend3V1(socialFi).getBuyPrice(account, 1);
-        uint256 _sellPrice = IFriend3V1(socialFi).getSellPrice(account, 1);
-        uint256 _sharesSupply = IFriend3V1(socialFi).ticketsSupply(account);
+        uint256 _buyPrice = IPostTechProfile(socialFi).getBuyPrice(account, 1);
+        uint256 _sellPrice = IPostTechProfile(socialFi).getSellPrice(
+            account,
+            1
+        );
+        uint256 _sharesSupply = IPostTechProfile(socialFi).sharesSupply(
+            account
+        );
 
         isChanged =
             _buyPrice != lastAccountUpdate[account].buyPrice ||
             _sellPrice != lastAccountUpdate[account].sellPrice ||
             _sharesSupply != lastAccountUpdate[account].sharesSupply;
+
         if (isChanged) {
             lastAccountUpdate[account].buyPrice = _buyPrice;
             lastAccountUpdate[account].sellPrice = _sellPrice;

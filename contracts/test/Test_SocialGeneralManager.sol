@@ -4,7 +4,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
 
-contract SocialGeneralManager is Ownable, CCIPReceiver {
+contract Test_SocialGeneralManager is Ownable, CCIPReceiver {
     /******* Enum *******/
     enum SocialType {
         POST_TECH, //Arbitrum

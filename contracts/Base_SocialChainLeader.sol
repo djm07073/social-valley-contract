@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import {SocialChainLeader} from "./SocialChainLeader.sol";
 import {IFriendtechSharesV1} from "./friend_tech/IFriendtechSharesV1.sol";
 
-contract Base_SocialChainLeaders is SocialChainLeader {
+contract Base_SocialChainLeader is SocialChainLeader {
     struct AccountState {
         uint256 buyPrice;
         uint256 sellPrice;
@@ -12,20 +12,11 @@ contract Base_SocialChainLeaders is SocialChainLeader {
     mapping(address => AccountState) public lastAccountUpdate;
 
     constructor(
-        uint updateInterval,
         address router,
         address link,
         address _socialFi,
         address _generalManager
-    )
-        SocialChainLeader(
-            updateInterval,
-            router,
-            link,
-            _socialFi,
-            _generalManager
-        )
-    {}
+    ) SocialChainLeader(router, link, _socialFi, _generalManager) {}
 
     function _checkAccountChange(
         address account

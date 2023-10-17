@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import {MessageSender} from "./MessageSender.sol";
+import {Test_MessageSender} from "./Test_MessageSender.sol";
 
 /**
  * @title SocialChainLeader
@@ -10,7 +10,7 @@ import {MessageSender} from "./MessageSender.sol";
  * @notice Gather social finance information from chain that this contract deployed
  */
 
-abstract contract SocialChainLeader is MessageSender {
+abstract contract Test_SocialChainLeader is Test_MessageSender {
     address public immutable socialFi;
     address public immutable generalManager;
     address[] public users;
@@ -28,7 +28,7 @@ abstract contract SocialChainLeader is MessageSender {
         address link,
         address _socialFi,
         address _generalManager
-    ) MessageSender(router, link) {
+    ) Test_MessageSender(router, link) {
         socialFi = _socialFi;
         generalManager = _generalManager;
     }
