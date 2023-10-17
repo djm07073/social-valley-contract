@@ -14,9 +14,8 @@ contract BNB_SocialChainLeader is SocialChainLeader {
     constructor(
         address router,
         address link,
-        address _socialFi,
-        address _generalManager
-    ) SocialChainLeader(router, link, _socialFi, _generalManager) {}
+        address _socialFi
+    ) SocialChainLeader(router, link, _socialFi) {}
 
     function _checkAccountChange(
         address account

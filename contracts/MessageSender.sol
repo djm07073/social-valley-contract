@@ -15,7 +15,7 @@ import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interface
 
 /// @title - A simple messenger contract for sending/receving string data across chains.
 abstract contract MessageSender is OwnerIsCreator {
-    uint64 public constant DESTINATION_CHAIN_SELECTOR = 4051577828743386545;
+    uint64 public constant DESTINATION_CHAIN_SELECTOR = 4051577828743386545; //POLYGON
     // Custom errors to provide more descriptive revert messages.
     error NotEnoughBalance(uint256 currentBalance, uint256 calculatedFees); // Used to make sure contract has enough balance.
     error NothingToWithdraw(); // Used when trying to withdraw Ether but there's nothing to withdraw.

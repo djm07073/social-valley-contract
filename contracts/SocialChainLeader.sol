@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import {MessageSender} from "./MessageSender.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title SocialChainLeader
@@ -10,9 +10,9 @@ import {MessageSender} from "./MessageSender.sol";
  * @notice Gather social finance information from chain that this contract deployed
  */
 
-abstract contract SocialChainLeader is MessageSender {
+abstract contract SocialChainLeader is Ownable {
     address public immutable socialFi;
-    address public immutable generalManager;
+
     address[] public users;
     bool isPayedByLink = true;
     bytes32 public lastSkewedMerkleRoot; // last skewed merkle root; will be sent to general manager per 1 hour
@@ -29,11 +29,9 @@ abstract contract SocialChainLeader is MessageSender {
     constructor(
         address router,
         address link,
-        address _socialFi,
-        address _generalManager
-    ) MessageSender(router, link) {
+        address _socialFi
+    ) Ownable(msg.sender) {
         socialFi = _socialFi;
-        generalManager = _generalManager;
     }
 
     //        Root - epoch N (0,1,2,3, ...)
@@ -128,34 +126,11 @@ abstract contract SocialChainLeader is MessageSender {
             abi.encodePacked(changedAccount)
         );
         epoch++;
-        if (epoch % 4 == 0) {
-            sendToGeneralManager();
-        }
     }
 
     function _checkAccountChange(
         address account
     ) internal virtual returns (bool);
-
-    /**
-     * @notice Send the merkle root to general manager
-     * @dev This function will be called by Time-based trigger per 1 hour
-     */
-    function sendToGeneralManager() internal returns (bytes32 messageId) {
-        if (isPayedByLink) {
-            messageId = sendMessagePayLINK(
-                generalManager,
-                lastSkewedMerkleRoot
-            );
-        } else {
-            messageId = sendMessagePayNative(
-                generalManager,
-                lastSkewedMerkleRoot
-            );
-        }
-
-        emit SendToGeneralManager(epoch, lastSkewedMerkleRoot);
-    }
 
     function addAccount(address newAccount) public onlyOwner {
         users.push(newAccount);
