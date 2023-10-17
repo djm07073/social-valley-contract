@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
-import {Test_SocialChainLeader} from "./Test_SocialChainLeader.sol";
-import {IPostTechProfile} from "../post_tech/IPostTechProfile.sol";
+import {SocialChainLeader} from "./SocialChainLeader.sol";
+import {IFriendtechSharesV1} from "./friend_tech/IFriendtechSharesV1.sol";
 
-contract Arbitrum_Goerli_SocialChainLeader is Test_SocialChainLeader {
+contract AVAX_SocialChainLeader is SocialChainLeader {
     struct AccountState {
         uint256 buyPrice;
         uint256 sellPrice;
@@ -11,22 +11,20 @@ contract Arbitrum_Goerli_SocialChainLeader is Test_SocialChainLeader {
     }
     mapping(address => AccountState) public lastAccountUpdate;
 
-    constructor(
-        address router,
-        address link,
-        address _socialFi,
-        address _generalManager
-    ) Test_SocialChainLeader(router, link, _socialFi, _generalManager) {}
+    constructor(address _socialFi) SocialChainLeader(_socialFi) {}
 
     function _checkAccountChange(
         address account
     ) internal virtual override returns (bool isChanged) {
-        uint256 _buyPrice = IPostTechProfile(socialFi).getBuyPrice(account, 1);
-        uint256 _sellPrice = IPostTechProfile(socialFi).getSellPrice(
+        uint256 _buyPrice = IFriendtechSharesV1(socialFi).getBuyPrice(
             account,
             1
         );
-        uint256 _sharesSupply = IPostTechProfile(socialFi).sharesSupply(
+        uint256 _sellPrice = IFriendtechSharesV1(socialFi).getSellPrice(
+            account,
+            1
+        );
+        uint256 _sharesSupply = IFriendtechSharesV1(socialFi).sharesSupply(
             account
         );
 
