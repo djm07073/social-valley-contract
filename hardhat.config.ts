@@ -3,6 +3,8 @@ import "@nomicfoundation/hardhat-toolbox";
 import dotenv from "dotenv";
 dotenv.config();
 const DEPLOY = process.env.DEPLOY!;
+const AR = process.env.ARBITRUM_KEY!;
+const KEY2 = process.env.KEY2!;
 const config: HardhatUserConfig = {
   solidity: "0.8.20",
   networks: {
@@ -29,8 +31,8 @@ const config: HardhatUserConfig = {
     },
     arbitrum_goerli: {
       chainId: 421613,
-      url: "https://endpoints.omniatech.io/v1/arbitrum/goerli/public",
-      accounts: [DEPLOY],
+      url: `https://arb-goerli.g.alchemy.com/v2/${AR}`,
+      accounts: [DEPLOY, KEY2],
     },
     optimism_goerli: {
       chainId: 420,

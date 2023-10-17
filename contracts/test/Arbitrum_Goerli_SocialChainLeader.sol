@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import {Test_SocialChainLeader} from "./Test_SocialChainLeader.sol";
 import {IPostTechProfile} from "../post_tech/IPostTechProfile.sol";
 
-contract Arbitrum_Goeril_SocialChainLeader is Test_SocialChainLeader {
+contract Arbitrum_Goerli_SocialChainLeader is Test_SocialChainLeader {
     struct AccountState {
         uint256 buyPrice;
         uint256 sellPrice;

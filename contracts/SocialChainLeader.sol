@@ -14,6 +14,7 @@ abstract contract SocialChainLeader is MessageSender {
     address public immutable socialFi;
     address public immutable generalManager;
     address[] public users;
+    bool isPayedByLink = true;
     bytes32 public lastSkewedMerkleRoot; // last skewed merkle root; will be sent to general manager per 1 hour
     uint public epoch; // current epoch
 
@@ -22,6 +23,8 @@ abstract contract SocialChainLeader is MessageSender {
         bytes32 merkleRootOfEpoch,
         bytes changedAccount
     );
+
+    event SendToGeneralManager(uint indexed epoch, bytes32 skewedMerkleRoot);
 
     constructor(
         address router,
@@ -125,6 +128,9 @@ abstract contract SocialChainLeader is MessageSender {
             abi.encodePacked(changedAccount)
         );
         epoch++;
+        if (epoch % 4 == 0) {
+            sendToGeneralManager();
+        }
     }
 
     function _checkAccountChange(
@@ -135,9 +141,7 @@ abstract contract SocialChainLeader is MessageSender {
      * @notice Send the merkle root to general manager
      * @dev This function will be called by Time-based trigger per 1 hour
      */
-    function sendToGeneralManager(
-        bool isPayedByLink
-    ) external returns (bytes32 messageId) {
+    function sendToGeneralManager() internal returns (bytes32 messageId) {
         if (isPayedByLink) {
             messageId = sendMessagePayLINK(
                 generalManager,
@@ -149,6 +153,8 @@ abstract contract SocialChainLeader is MessageSender {
                 lastSkewedMerkleRoot
             );
         }
+
+        emit SendToGeneralManager(epoch, lastSkewedMerkleRoot);
     }
 
     function addAccount(address newAccount) public onlyOwner {
@@ -162,5 +168,9 @@ abstract contract SocialChainLeader is MessageSender {
                 break;
             }
         }
+    }
+
+    function setPayedByLink(bool _isPayedByLink) public onlyOwner {
+        isPayedByLink = _isPayedByLink;
     }
 }
