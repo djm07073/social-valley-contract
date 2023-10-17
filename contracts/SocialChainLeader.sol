@@ -26,11 +26,7 @@ abstract contract SocialChainLeader is Ownable {
 
     event SendToGeneralManager(uint indexed epoch, bytes32 skewedMerkleRoot);
 
-    constructor(
-        address router,
-        address link,
-        address _socialFi
-    ) Ownable(msg.sender) {
+    constructor(address _socialFi) Ownable(msg.sender) {
         socialFi = _socialFi;
     }
 
@@ -132,8 +128,8 @@ abstract contract SocialChainLeader is Ownable {
         address account
     ) internal virtual returns (bool);
 
-    function addAccount(address newAccount) public onlyOwner {
-        users.push(newAccount);
+    function addAccount() public onlyOwner {
+        users.push(msg.sender);
     }
 
     function deleteAccount(address account) public onlyOwner {

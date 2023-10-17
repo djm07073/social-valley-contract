@@ -11,12 +11,7 @@ contract Base_SocialChainLeader is SocialChainLeader {
     }
     mapping(address => AccountState) public lastAccountUpdate;
 
-    constructor(
-        address router,
-        address link,
-        address _socialFi,
-        address _generalManager
-    ) SocialChainLeader(router, link, _socialFi, _generalManager) {}
+    constructor(address _socialFi) SocialChainLeader(_socialFi) {}
 
     function _checkAccountChange(
         address account

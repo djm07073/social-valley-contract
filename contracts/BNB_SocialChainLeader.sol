@@ -11,11 +11,7 @@ contract BNB_SocialChainLeader is SocialChainLeader {
     }
     mapping(address => AccountState) public lastAccountUpdate;
 
-    constructor(
-        address router,
-        address link,
-        address _socialFi
-    ) SocialChainLeader(router, link, _socialFi) {}
+    constructor(address _socialFi) SocialChainLeader(_socialFi) {}
 
     function _checkAccountChange(
         address account
