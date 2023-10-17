@@ -13,7 +13,6 @@ abstract contract SocialChainLeader is Ownable {
     address public immutable socialFi;
 
     address[] public users;
-    bool isPayedByLink = true;
     bytes32 public lastSkewedMerkleRoot; // last skewed merkle root; will be sent to general manager per 1 hour
     uint public epoch; // current epoch
 
@@ -138,9 +137,5 @@ abstract contract SocialChainLeader is Ownable {
                 break;
             }
         }
-    }
-
-    function setPayedByLink(bool _isPayedByLink) public onlyOwner {
-        isPayedByLink = _isPayedByLink;
     }
 }

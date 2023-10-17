@@ -13,7 +13,6 @@ export const SOCIAL: SOCIAL_FI = {
   42161: {
     socialFi: "0x87da6930626fe0c7db8bc15587ec0e410937e5dc",
   }, // ARBITRUM
-
   421613: {
     socialFi: "0x9Da9b07981d2db157F512F2dFD9A348CF763ED27",
   }, // ARBITRUM GOERLI

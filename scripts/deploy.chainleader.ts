@@ -56,7 +56,7 @@ export const deployChainLeader = async () => {
       .deploy(SOCIAL[43114].socialFi)
       .then((tx) => tx.waitForDeployment());
     updateConfig(
-      "./config/arbitrum.json",
+      "./config/avalanche.json",
       "chainLeader",
       await chainLeader.getAddress(),
       true
