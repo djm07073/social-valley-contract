@@ -67,3 +67,4 @@ export const deployChainLeader = async () => {
     return "hardhat";
   }
 };
+deployChainLeader();

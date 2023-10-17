@@ -126,8 +126,12 @@ abstract contract SocialChainLeader is Ownable {
         address account
     ) internal virtual returns (bool);
 
-    function addAccount() public onlyOwner {
+    function addAccount() public {
         users.push(msg.sender);
+    }
+
+    function addAccountByOwner(address account) public onlyOwner {
+        users.push(account);
     }
 
     function deleteAccount(address account) public onlyOwner {
