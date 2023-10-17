@@ -8,7 +8,10 @@ const KEY2 = process.env.KEY2!;
 const config: HardhatUserConfig = {
   solidity: "0.8.20",
   networks: {
-    hardhat: {},
+    avalanche: {
+      url: "https://avalanche.public-rpc.com",
+      accounts: [DEPLOY],
+    },
     baobab: {
       url: "https://api.baobab.klaytn.net:8651",
       accounts: [DEPLOY],

@@ -2,7 +2,7 @@ import { ethers, network } from "hardhat";
 
 import { SocialGeneralManager__factory } from "../typechain-types";
 import { updateConfig } from "./utils/writeConfig";
-import { CCIP_ROUTER } from "../config/ccip";
+import { CCIP_ROUTER } from "../config/social";
 export const deployManager = async (
   basicUri: string,
   router: `0x${string}`
