@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 /**
  * @title SocialChainLeader
@@ -12,10 +13,11 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 abstract contract SocialChainLeader is Ownable {
     address public immutable socialFi;
 
+    string private _baseUrl;
     address[] public users;
     bytes32 public lastSkewedMerkleRoot; // last skewed merkle root; will be sent to general manager per 1 hour
     uint public epoch; // current epoch
-
+    mapping(address => string) public ipnsUrls; // ipns url of user
     event ChangeAccount(
         uint indexed epoch,
         bytes32 merkleRootOfEpoch,
@@ -126,12 +128,21 @@ abstract contract SocialChainLeader is Ownable {
         address account
     ) internal virtual returns (bool);
 
-    function addAccount() public {
+    function addAccount(string memory ipnsUrl) public {
         users.push(msg.sender);
+        ipnsUrls[msg.sender] = ipnsUrl;
     }
 
     function addAccountByOwner(address account) public onlyOwner {
         users.push(account);
+    }
+
+    function setBaseUrl(string memory baseUrl) public onlyOwner {
+        _baseUrl = baseUrl;
+    }
+
+    function getIPFSUrl(address account) public view returns (string memory) {
+        return string.concat(_baseUrl, ipnsUrls[account]);
     }
 
     function deleteAccount(address account) public onlyOwner {
