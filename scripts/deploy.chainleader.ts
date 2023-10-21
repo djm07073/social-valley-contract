@@ -2,10 +2,9 @@ import { ethers, network } from "hardhat";
 import {
   AVAX_SocialChainLeader__factory,
   Arbitrum_SocialChainLeader__factory,
-  BNB_SocialChainLeader__factory,
   Base_SocialChainLeader__factory,
 } from "../typechain-types";
-import { updateConfig } from "./utils/writeConfig";
+import { updateConfig } from "./utils/updateConfig";
 import "../config/optimism_goerli.json";
 import { SOCIAL } from "../config/social";
 
@@ -18,19 +17,6 @@ export const deployChainLeader = async () => {
       .then((tx) => tx.waitForDeployment());
     updateConfig(
       "./config/base.json",
-      "chainLeader",
-      await chainLeader.getAddress(),
-      true
-    );
-    return await chainLeader.getAddress();
-  } else if (network.name === "bnb") {
-    const chainLeader_f: BNB_SocialChainLeader__factory =
-      await ethers.getContractFactory("BNB_SocialChainLeader");
-    const chainLeader = await chainLeader_f
-      .deploy(SOCIAL[56].socialFi)
-      .then((tx) => tx.waitForDeployment());
-    updateConfig(
-      "./config/bnb.json",
       "chainLeader",
       await chainLeader.getAddress(),
       true

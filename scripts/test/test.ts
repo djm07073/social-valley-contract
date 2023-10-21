@@ -1,6 +1,6 @@
 import { ethers, network } from "hardhat";
 
-import { updateConfig } from "../utils/writeConfig";
+import { updateConfig } from "../utils/updateConfig";
 
 export const setFriendTech = async () => {
   const friend_f = await ethers.getContractFactory("FriendtechSharesV1");
